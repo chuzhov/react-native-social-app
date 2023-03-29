@@ -31,7 +31,6 @@ const RegistrationScreen = navigation => {
   const emailInputHandler = userInput => {
     setEmail(userInput);
   };
-
   const passwordInputHandler = userInput => {
     setPassword(userInput);
   };
@@ -44,6 +43,8 @@ const RegistrationScreen = navigation => {
     data.append('password', password);
     data.append('file', avatar);
 
+    console.log(data);
+
     setLogin('');
     setEmail('');
     setPassword('');
@@ -52,7 +53,6 @@ const RegistrationScreen = navigation => {
   const togglePasswordVisiblity = () => {
     setPasswordVisible(!passwordVisible);
   };
-
   const hideKeyboard = () => {
     Keyboard.dismiss();
     setKeyboardVisible(false);

@@ -5,10 +5,6 @@ import * as Font from 'expo-font';
 import RegisterScreen from './Screens/RegistrationScreen';
 import LoginScreen from './Screens/LoginScreen';
 
-// Keep the splash screen visible while we fetch resources
-// Why expo place it here???
-// SplashScreen.preventAutoHideAsync();
-
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
   const appFonts = {

@@ -37,7 +37,7 @@ const LoginScreen = () => {
     setEmail('');
     setPassword('');
 
-    navigation.navigate('Home', { data });
+    console.log(data);
   };
 
   const togglePasswordVisibility = () => {
