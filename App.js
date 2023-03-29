@@ -1,20 +1,40 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
+import * as Font from 'expo-font';
+
+import RegisterScreen from './Screens/RegistrationScreen';
+import LoginScreen from './Screens/LoginScreen';
+
+// Keep the splash screen visible while we fetch resources
+// Why expo place it here???
+// SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+  const [appIsReady, setAppIsReady] = useState(false);
+  const appFonts = {
+    'Roboto-Regular': require('./assets/fonts/Roboto/Roboto-Regular.ttf'),
+    'Roboto-Medium': require('./assets/fonts/Roboto/Roboto-Medium.ttf'),
+    'Roboto-Bold': require('./assets/fonts/Roboto/Roboto-Bold.ttf'),
+  };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+  useEffect(() => {
+    async function prepare() {
+      try {
+        // Pre-load fonts, make any API calls you need to do here
+        SplashScreen.preventAutoHideAsync();
+        await Font.loadAsync(appFonts);
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        // Tell the application to render
+        SplashScreen.hideAsync();
+        setAppIsReady(true);
+      }
+    }
+    prepare();
+  }, []);
+
+  if (!appIsReady) {
+    return null;
+  } else return <LoginScreen />;
+}
