@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
+import { createStackNavigator } from '@react-navigation/stack';
+import { NavigationContainer } from '@react-navigation/native';
 
-import RegisterScreen from './Screens/RegistrationScreen';
 import LoginScreen from './Screens/LoginScreen';
+import RegisterScreen from './Screens/RegistrationScreen';
+import Home from './Screens/Home';
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
@@ -30,7 +33,32 @@ export default function App() {
     prepare();
   }, []);
 
+  const isLoggedIn = false;
+
+  const Stack = createStackNavigator();
+
   if (!appIsReady) {
     return null;
-  } else return <LoginScreen />;
+  } else
+    return (
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Login">
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Registration"
+            component={RegisterScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Home"
+            component={Home}
+            options={{ headerShown: false }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    );
 }

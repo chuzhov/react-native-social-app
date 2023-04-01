@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { imageUploader } from '../utils/imageUploader';
 
-const RegistrationScreen = navigation => {
+const RegistrationScreen = ({ navigation }) => {
   const [login, setLogin] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -169,7 +169,7 @@ const RegistrationScreen = navigation => {
                       opacity: !password ? 0.5 : 1,
                     }}
                   >
-                    {isPasswordShown ? 'Hide' : 'Show'}
+                    {passwordVisible ? 'Hide' : 'Show'}
                   </Text>
                 </Pressable>
               </View>
@@ -187,7 +187,7 @@ const RegistrationScreen = navigation => {
                 <Text style={styles.passwordIndicatorText}>
                   Already have an account?
                 </Text>
-                <Pressable onPress={() => navigation.navigate('LoginScreen')}>
+                <Pressable onPress={() => navigation.navigate('Login')}>
                   <Text style={styles.passwordIndicatorText}>Log in</Text>
                 </Pressable>
               </View>
@@ -240,14 +240,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Regular',
     color: '#1B4371',
     fontSize: 16,
-    fontWeight: 400,
     textAlign: 'right',
   },
   title: {
     fontFamily: 'Roboto-Medium',
     fontSize: 30,
     color: '#212121',
-    fontWeight: 500,
     lineHeight: 35,
     textAlign: 'center',
     letterSpacing: 0.01,

@@ -12,8 +12,9 @@ import {
   ImageBackground,
   Text,
 } from 'react-native';
+import { clockRunning } from 'react-native-reanimated';
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitDisabled, setSubmitDisabled] = useState(true);
@@ -130,7 +131,11 @@ const LoginScreen = () => {
               <Pressable
                 disabled={submitDisabled}
                 style={{ ...styles.button, opacity: submitDisabled ? 0.7 : 1 }}
-                onPress={onLoginSubmit}
+                // onPress={onLoginSubmit} TEMPORARY!
+                onPress={() => {
+                  console.log(navigation);
+                  navigation.navigate('Home');
+                }}
                 accessibilityLabel={'Login'}
               >
                 <Text style={styles.buttonText}>Log in</Text>
@@ -138,12 +143,9 @@ const LoginScreen = () => {
 
               <View style={styles.signupRedirectBlock}>
                 <Text style={styles.passwordIndicatorText}>
-                  {' '}
                   Don't have an account?
                 </Text>
-                <Pressable
-                  onPress={() => navigation.navigate('RegistrationScreen')}
-                >
+                <Pressable onPress={() => navigation.navigate('Registration')}>
                   <Text style={styles.passwordIndicatorText}>Register</Text>
                 </Pressable>
               </View>
@@ -196,7 +198,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Regular',
     color: '#1B4371',
     fontSize: 16,
-    fontWeight: 400,
     textAlign: 'right',
   },
 
@@ -204,7 +205,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Medium',
     fontSize: 30,
     color: '#212121',
-    fontWeight: 500,
     lineHeight: 35,
     textAlign: 'center',
     letterSpacing: 0.01,
