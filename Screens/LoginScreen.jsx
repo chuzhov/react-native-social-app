@@ -12,7 +12,6 @@ import {
   ImageBackground,
   Text,
 } from 'react-native';
-import { clockRunning } from 'react-native-reanimated';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -37,8 +36,6 @@ const LoginScreen = ({ navigation }) => {
 
     setEmail('');
     setPassword('');
-
-    console.log(data);
   };
 
   const togglePasswordVisibility = () => {
@@ -133,7 +130,6 @@ const LoginScreen = ({ navigation }) => {
                 style={{ ...styles.button, opacity: submitDisabled ? 0.7 : 1 }}
                 // onPress={onLoginSubmit} TEMPORARY!
                 onPress={() => {
-                  console.log(navigation);
                   navigation.navigate('Home');
                 }}
                 accessibilityLabel={'Login'}

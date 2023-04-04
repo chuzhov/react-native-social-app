@@ -7,6 +7,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import LoginScreen from './Screens/LoginScreen';
 import RegisterScreen from './Screens/RegistrationScreen';
 import Home from './Screens/Home';
+import MapScreen from './Screens/MapScreen';
+import CommentsScreen from './Screens/CommentsScreen';
+import GoBackBtn from './Components/GoBackBtn';
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
@@ -33,8 +36,6 @@ export default function App() {
     prepare();
   }, []);
 
-  const isLoggedIn = false;
-
   const Stack = createStackNavigator();
 
   if (!appIsReady) {
@@ -57,6 +58,22 @@ export default function App() {
             name="Home"
             component={Home}
             options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Map"
+            component={MapScreen}
+            options={({ navigation }) => ({
+              headerLeft: () => <GoBackBtn navigation={navigation} />,
+              headerShown: true,
+            })}
+          />
+          <Stack.Screen
+            name="Comments"
+            component={CommentsScreen}
+            options={({ navigation }) => ({
+              headerLeft: () => <GoBackBtn navigation={navigation} />,
+              headerShown: true,
+            })}
           />
         </Stack.Navigator>
       </NavigationContainer>

@@ -43,8 +43,6 @@ const RegistrationScreen = ({ navigation }) => {
     data.append('password', password);
     data.append('file', avatar);
 
-    console.log(data);
-
     setLogin('');
     setEmail('');
     setPassword('');

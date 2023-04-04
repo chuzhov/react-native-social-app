@@ -3,7 +3,6 @@ import Icon from '@expo/vector-icons/Feather';
 import { Pressable } from 'react-native';
 
 const LogOutBtn = ({ navigation }) => {
-  console.log(navigation);
   return (
     <Pressable onPress={() => navigation.navigate('Login')}>
       <Icon

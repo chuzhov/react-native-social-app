@@ -4,8 +4,6 @@ import { Pressable } from 'react-native';
 
 //nav={navigation} route={route}
 const GoBackBtn = ({ navigation }) => {
-  console.log('Navigation in the button');
-  console.dir(navigation);
   return (
     <Pressable onPress={() => navigation.goBack()}>
       <Icon
