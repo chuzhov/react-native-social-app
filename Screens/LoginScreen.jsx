@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
+import { useDispatch } from 'react-redux';
 import {
   TouchableWithoutFeedback,
   StyleSheet,
@@ -13,6 +14,9 @@ import {
   Text,
 } from 'react-native';
 
+import { signIn } from '../redux/auth/authOperations';
+import { resetAuthError } from '../redux/auth/authSlice';
+
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,6 +24,7 @@ const LoginScreen = ({ navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [focused, setFocused] = useState('');
+  const dispatch = useDispatch();
 
   const emailInputHandler = userInput => {
     setEmail(userInput);
@@ -28,14 +33,17 @@ const LoginScreen = ({ navigation }) => {
     setPassword(userInput);
   };
 
-  const onLoginSubmit = event => {
+  const onLoginSubmit = async event => {
     event.preventDefault();
-    const data = new FormData();
-    data.append('email', email);
-    data.append('password', password);
 
-    setEmail('');
-    setPassword('');
+    const result = await dispatch(signIn({ email, password }));
+    if (result.error) {
+      dispatch(resetAuthError());
+    } else {
+      setEmail('');
+      setPassword('');
+      navigation.navigate('Home');
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -128,10 +136,7 @@ const LoginScreen = ({ navigation }) => {
               <Pressable
                 disabled={submitDisabled}
                 style={{ ...styles.button, opacity: submitDisabled ? 0.7 : 1 }}
-                // onPress={onLoginSubmit} TEMPORARY!
-                onPress={() => {
-                  navigation.navigate('Home');
-                }}
+                onPress={onLoginSubmit}
                 accessibilityLabel={'Login'}
               >
                 <Text style={styles.buttonText}>Log in</Text>

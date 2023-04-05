@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Icon from '@expo/vector-icons/Feather';
 import {
   TouchableWithoutFeedback,
@@ -14,9 +15,11 @@ import {
   Image,
 } from 'react-native';
 import { imageUploader } from '../utils/imageUploader';
+import { signUp } from '../redux/auth/authOperations';
+import { resetAuthError } from '../redux/auth/authSlice';
 
 const RegistrationScreen = ({ navigation }) => {
-  const [login, setLogin] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [avatar, setAvatar] = useState(null);
@@ -24,9 +27,10 @@ const RegistrationScreen = ({ navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [focused, setFocused] = useState('');
+  const dispatch = useDispatch();
 
-  const loginInputHandler = userInput => {
-    setLogin(userInput);
+  const displayNameInputHandler = userInput => {
+    setDisplayName(userInput);
   };
   const emailInputHandler = userInput => {
     setEmail(userInput);
@@ -35,17 +39,22 @@ const RegistrationScreen = ({ navigation }) => {
     setPassword(userInput);
   };
 
-  const onRegFormSubmit = event => {
+  const onRegFormSubmit = async event => {
     event.preventDefault();
-    const data = new FormData();
-    data.append('login', login);
-    data.append('email', email);
-    data.append('password', password);
-    data.append('file', avatar);
 
-    setLogin('');
+    setDisplayName('');
     setEmail('');
     setPassword('');
+
+    const result = await dispatch(
+      signUp({ displayName, email, password, avatar })
+    );
+    if (result.error) {
+      //handle signup error
+      dispatch(resetAuthError());
+    } else {
+      navigation.navigate('Home');
+    }
   };
 
   const togglePasswordVisiblity = () => {
@@ -57,13 +66,13 @@ const RegistrationScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
-    if (email && password && login) {
+    if (email && password && displayName) {
       setSubmitDisabled(false);
     }
-    if (!email || !password || !login) {
+    if (!email || !password || !displayName) {
       setSubmitDisabled(true);
     }
-  }, [email, password, login]);
+  }, [email, password, displayName]);
 
   return (
     <TouchableWithoutFeedback onPress={hideKeyboard}>
@@ -104,19 +113,20 @@ const RegistrationScreen = ({ navigation }) => {
 
               <View style={styles.inputWrapper}>
                 <TextInput
-                  value={login}
-                  onChangeText={loginInputHandler}
+                  value={displayName}
+                  onChangeText={displayNameInputHandler}
                   onFocus={() => {
                     setKeyboardVisible(true);
-                    setFocused('login');
+                    setFocused('displayName');
                   }}
                   onBlur={() => {
                     setFocused('');
                   }}
-                  placeholder="Login"
+                  placeholder="Name"
                   style={{
                     ...styles.input,
-                    borderColor: focused === 'login' ? '#FF6C00' : '#E8E8E8',
+                    borderColor:
+                      focused === 'displayName' ? '#FF6C00' : '#E8E8E8',
                   }}
                 />
               </View>
@@ -181,7 +191,7 @@ const RegistrationScreen = ({ navigation }) => {
                 <Text style={styles.buttonText}>Register</Text>
               </Pressable>
 
-              <View style={styles.loginRedirectBlock}>
+              <View style={styles.displayNameRedirectBlock}>
                 <Text style={styles.passwordIndicatorText}>
                   Already have an account?
                 </Text>
@@ -283,7 +293,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
   },
-  loginRedirectBlock: {
+  displayNameRedirectBlock: {
     marginTop: 16,
     display: 'flex',
     flexDirection: 'row',
