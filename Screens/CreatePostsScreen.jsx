@@ -18,6 +18,9 @@ import Icon from '@expo/vector-icons/MaterialIcons';
 import { Feather } from '@expo/vector-icons';
 
 import { GEOLOC_API_URL, GEOLOC_API_KEY } from '../config/config';
+import { useDispatch, useSelector } from 'react-redux';
+import { addPost } from '../redux/core/coreOperations';
+import { userIdSelector } from '../redux/auth/authSelectors';
 
 const CreatePostScreen = ({ navigation }) => {
   const initialFormState = {
@@ -37,6 +40,8 @@ const CreatePostScreen = ({ navigation }) => {
     latitude: '',
     longitude: '',
   });
+  const dispatch = useDispatch();
+  const userId = useSelector(userIdSelector);
 
   const takePhoto = async () => {
     if (camera) {
@@ -83,15 +88,26 @@ const CreatePostScreen = ({ navigation }) => {
 
   const onSubmitForm = async e => {
     e.preventDefault();
-    // const data = new FormData();
-    // data.append("image", state.image);
-    // data.append("title", state.title);
-    // data.append("position", state.position);
 
-    setKeyboardVisible(false);
-    setFormState(initialFormState);
-    setSubmitDisabled(true);
-    navigation.navigate('Posts');
+    const result = await dispatch(
+      addPost({
+        userId,
+        title: formState.title,
+        image: formState.image,
+        coordinates: mainLocation,
+        location: formState.position,
+      })
+    );
+
+    if (result.error) {
+      console.log(error);
+    } else {
+      setKeyboardVisible(false);
+      setFormState(initialFormState);
+      setSubmitDisabled(true);
+
+      navigation.navigate('Posts');
+    }
   };
 
   useEffect(() => {

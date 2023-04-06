@@ -39,6 +39,7 @@ const LoginScreen = ({ navigation }) => {
     const result = await dispatch(signIn({ email, password }));
     if (result.error) {
       dispatch(resetAuthError());
+      //handle login error
     } else {
       setEmail('');
       setPassword('');

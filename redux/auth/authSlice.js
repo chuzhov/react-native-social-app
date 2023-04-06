@@ -16,7 +16,7 @@ const initialState = {
   isUserFetching: false,
   authError: null,
   userData: {
-    uid: null,
+    userId: null,
     email: null,
     name: null,
     avatar: null,
@@ -35,7 +35,7 @@ export const authSlice = createSlice({
   extraReducers: builder =>
     builder
       .addCase(signUp.fulfilled, (state, { payload }) => {
-        state.userData.uid = payload.uid;
+        state.userData.userId = payload.uid;
         state.userData.email = payload.email;
         state.userData.name = payload.name;
         state.userData.avatar = payload.avatar;
@@ -45,10 +45,10 @@ export const authSlice = createSlice({
       .addCase(signIn.fulfilled, (state, { payload }) => {
         console.log(payload);
 
-        state.userData.uid = payload.uid;
+        state.userData.userId = payload.uid;
         state.userData.email = payload.email;
-        state.userData.name = payload.displayName;
-        state.userData.avatar = payload.photoURL;
+        state.userData.name = payload.name;
+        state.userData.avatar = payload.avatar;
         state.isLoggedIn = true;
         state.isUserFetching = false;
       })
