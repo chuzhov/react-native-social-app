@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import { useDispatch, useSelector } from 'react-redux';
 import {
   View,
   Image,
@@ -11,22 +11,29 @@ import {
 } from 'react-native';
 import Icon from '@expo/vector-icons/Feather';
 
-const MOCK_POST = [
-  {
-    postId: 1,
-    image: 'https://picsum.photos/200',
-    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    comments: [`Shite, it's cool!`],
-    location: 'London',
-    coordinates: {
-      latitude: 51.5074,
-      longitude: 0.1278,
-    },
-  },
-];
+import {
+  userAvatarSelector,
+  userEmailSelector,
+  userNameSelector,
+} from '../redux/auth/authSelectors';
+import { getPosts } from '../redux/core/coreOperations';
+import { postsSelector } from '../redux/core/coreSelectors';
 
 const PostsScreen = ({ navigation, route }) => {
-  const [posts, setPosts] = useState(MOCK_POST);
+  const dispatch = useDispatch();
+  const image = useSelector(userAvatarSelector);
+  const name = useSelector(userNameSelector);
+  const email = useSelector(userEmailSelector);
+
+  const posts = useSelector(postsSelector);
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      dispatch(getPosts());
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, [navigation]);
 
   const handleComment = (image, comments, postId) => {
     navigation.navigate('Comments', { image, comments, postId });
@@ -35,13 +42,6 @@ const PostsScreen = ({ navigation, route }) => {
   const handleLocation = (coordinates, text, location) => {
     navigation.navigate('Map', { coordinates, text, location });
   };
-
-  const MOCK_DATA = {
-    image: 'https://picsum.photos/200',
-    name: 'John Doe',
-    email: 'john@email.com',
-  };
-  const { image, name, email } = MOCK_DATA;
 
   return (
     <View style={styles.container}>
@@ -52,8 +52,8 @@ const PostsScreen = ({ navigation, route }) => {
           ) : null}
         </View>
         <View>
-          <Text style={styles.name}>{name ? name : 'User'}</Text>
-          <Text style={styles.email}>{email ? email : ''}</Text>
+          <Text style={styles.name}>{name ? name : 'Dear User'}</Text>
+          <Text style={styles.email}>{email ? email : 'No email'}</Text>
         </View>
       </View>
       <View style={styles.postsList}>
@@ -63,7 +63,7 @@ const PostsScreen = ({ navigation, route }) => {
               posts.length <= 0 ? (
                 <View style={styles.emptyMessageBox}>
                   <Text style={styles.emptyMessageStyle}>
-                    No posts added yet
+                    No posts added yet...
                   </Text>
                 </View>
               ) : null
@@ -71,12 +71,15 @@ const PostsScreen = ({ navigation, route }) => {
             data={posts}
             renderItem={({ item }) => (
               <View style={styles.postsListItem}>
-                <Image style={styles.postImage} source={{ uri: item.image }} />
-                <Text style={styles.postText}>{item.text}</Text>
+                <Image
+                  style={styles.postImage}
+                  source={{ uri: item.imageUrl }}
+                />
+                <Text style={styles.postText}>{item.title}</Text>
                 <View style={styles.postDataWrapper}>
                   <Pressable
                     onPress={() => {
-                      handleComment(item.image, item.comments, item.postId);
+                      handleComment(item.imageUrl, item.comments, item.id);
                     }}
                   >
                     <View style={styles.postDataCommentsWrapper}>
@@ -90,7 +93,7 @@ const PostsScreen = ({ navigation, route }) => {
                     onPress={() => {
                       handleLocation(
                         item.coordinates,
-                        item.text,
+                        item.title,
                         item.location
                       );
                     }}
@@ -103,7 +106,7 @@ const PostsScreen = ({ navigation, route }) => {
                 </View>
               </View>
             )}
-            keyExtractor={item => item.postId}
+            keyExtractor={item => item.id}
           />
         </SafeAreaView>
       </View>
@@ -151,6 +154,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   postsList: {
+    width: '100%',
     marginTop: 32,
     paddingBottom: 50,
   },
@@ -161,8 +165,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   postImage: {
-    width: 434,
+    width: '100%',
     height: 240,
+    borderRadius: 8,
   },
   postText: {
     fontFamily: 'Roboto-Medium',

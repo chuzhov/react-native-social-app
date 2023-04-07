@@ -6,6 +6,7 @@ import addCommentToPostInDB from '../../services/addCommentToPostInBD';
 import addPostToDB from '../../services/addPostToDB';
 import addUsersLikeToDB from '../../services/addUsersLikeToDB';
 import removeUsersLikeFromDB from '../../services/removeUsersLikeFromDB';
+import getAllPostsFromDB from '../../services/getAllPostsFromDB';
 
 export const addPost = createAsyncThunk(
   'DB/addPost',
@@ -46,9 +47,10 @@ export const addPost = createAsyncThunk(
 
 export const getPosts = createAsyncThunk(
   'db/getPosts',
-  async (setPosts, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const result = await getAllPostsFromDB({ setPosts: setPosts });
+      const result = await getAllPostsFromDB();
+
       return result;
     } catch (error) {
       console.dir({ error });

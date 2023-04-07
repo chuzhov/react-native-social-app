@@ -35,6 +35,7 @@ export const coreSlice = createSlice({
         state.isDataFetching = false;
       })
       .addCase(getPosts.fulfilled, (state, { payload }) => {
+        state.posts = payload;
         state.isDataFetching = false;
       })
       .addCase(getCurrentUsersPosts.fulfilled, (state, { payload }) => {
