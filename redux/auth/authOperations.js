@@ -1,6 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 //import { loginDB, registerDB, logOut } from '../../services/auth';
 import { auth, storage } from '../../firebase/config';
+import uploadAvatarToFireStorage from '../../services/uploadImageToFireStorage';
+import { DEFAULT_AVATAR } from '../../config/config';
 
 export const signUp = createAsyncThunk(
   'AUTH/signup',
@@ -11,22 +13,24 @@ export const signUp = createAsyncThunk(
         email,
         password
       );
+      let avatarUrl = '';
       // Upload the user's avatar image to Firebase Storage
-      const avatarRef = storage.ref(`avatars/${user.uid}.jpg`);
-      await avatarRef.put(avatar);
-      const avatarUrl = await avatarRef.getDownloadURL();
+      if (avatar) {
+        avatarUrl = await uploadAvatarToFireStorage(user.id, avatar);
+      } else {
+        avatarUrl = DEFAULT_AVATAR;
+      }
       // Update the user's profile with their name and avatar URL
       await user.updateProfile({
         displayName,
         photoURL: avatarUrl,
       });
       // Return the user object
-      console.log(user);
       return {
         uid: user.uid,
         email: user.email,
-        name: user.displayName,
-        avatar: user.avatarUrl,
+        name: displayName,
+        avatar: avatarUrl,
       };
     } catch (error) {
       //       error.code = 'auth/network-request-failed'
@@ -34,8 +38,7 @@ export const signUp = createAsyncThunk(
       // auth/invalid-email
       // auth/weak-password
 
-      console.log(error.code);
-      console.log(error.message);
+      console.log(error);
 
       return rejectWithValue(error.code);
     }
@@ -45,16 +48,14 @@ export const signUp = createAsyncThunk(
 export const signIn = createAsyncThunk(
   'AUTH/signin',
   async ({ email, password }, { rejectWithValue }) => {
-    console.dir(auth);
     try {
       const { user } = await auth.signInWithEmailAndPassword(email, password);
-      // const result = await auth.signIn(email, password);
 
       return {
         uid: user.uid,
         email: user.email,
         name: user.displayName,
-        avatar: user.avatarUrl,
+        avatar: user.photoURL,
       };
     } catch (error) {
       console.dir(error);
@@ -77,34 +78,3 @@ export const logOut = createAsyncThunk(
     }
   }
 );
-
-//   export const currentUser = createAsyncThunk(
-//     'AUTH/currentUser',
-//     async (_, { rejectWithValue }) => {
-//       try {
-//         const result = await getCurrentUserInfo();
-//         console.log('current', result);
-//         return result;
-
-//       } catch (error) {
-//         console.error({error})
-
-//         return rejectWithValue(error);
-//       }
-//     }
-//   );
-
-//   export const currentState = createAsyncThunk(
-//     'AUTH/currentState',
-//     async (_, { rejectWithValue }) => {
-//       try {
-//         const result = await authStateChanged();
-//         // console.log('state', result);
-//         return result
-
-//       } catch (error) {
-//         console.error({error})
-//         return rejectWithValue(error);
-//       }
-//     }
-//   );

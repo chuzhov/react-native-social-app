@@ -20,7 +20,11 @@ import { Feather } from '@expo/vector-icons';
 import { GEOLOC_API_URL, GEOLOC_API_KEY } from '../config/config';
 import { useDispatch, useSelector } from 'react-redux';
 import { addPost } from '../redux/core/coreOperations';
-import { userIdSelector } from '../redux/auth/authSelectors';
+import {
+  userIdSelector,
+  userNameSelector,
+  userAvatarSelector,
+} from '../redux/auth/authSelectors';
 
 const CreatePostScreen = ({ navigation }) => {
   const initialFormState = {
@@ -42,6 +46,8 @@ const CreatePostScreen = ({ navigation }) => {
   });
   const dispatch = useDispatch();
   const userId = useSelector(userIdSelector);
+  const userName = useSelector(userNameSelector);
+  const userAvatar = useSelector(userAvatarSelector);
 
   const takePhoto = async () => {
     if (camera) {
@@ -92,6 +98,8 @@ const CreatePostScreen = ({ navigation }) => {
     const result = await dispatch(
       addPost({
         userId,
+        userName,
+        userAvatar,
         title: formState.title,
         image: formState.image,
         coordinates: mainLocation,

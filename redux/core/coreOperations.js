@@ -1,28 +1,32 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { storage, db } from '../../firebase/config';
-// import {
-//   addPostToDB,
-//   addCommentToPostInDB,
-//   getAllPostsFromDB,
-//   getAllCommentsToPostFromDB,
-//   addLikeToPostInDB,
-//   removeLikeToPostInDB,
-//   getUsersPostsFromDB,
-// } from '../../services/db';
 
 import uploadImageToFireStorage from '../../services/uploadImageToFireStorage';
+import { getSpecificUsersPostsFromDB } from '../../services/getSpecificUsersPosts';
+import addCommentToPostInDB from '../../services/addCommentToPostInBD';
+import addPostToDB from '../../services/addPostToDB';
+import addUsersLikeToDB from '../../services/addUsersLikeToDB';
+import removeUsersLikeFromDB from '../../services/removeUsersLikeFromDB';
 
 export const addPost = createAsyncThunk(
   'DB/addPost',
   async (data, { rejectWithValue }) => {
-    console.dir(data);
     try {
-      const { userId, image, location, coordinates, title } = data;
+      const {
+        userId,
+        userName,
+        userAvatar,
+        image,
+        location,
+        coordinates,
+        title,
+      } = data;
 
       const imageUrl = await uploadImageToFireStorage(userId, image);
 
       const newPost = {
         userId,
+        userName,
+        userAvatar,
         title,
         imageUrl,
         location,
@@ -31,10 +35,7 @@ export const addPost = createAsyncThunk(
         likes: [],
         createdAt: new Date(),
       };
-      const postsCollection = db.collection('posts');
-      const newPostRef = await postsCollection.add(newPost);
-
-      return newPostRef.id;
+      return await addPostToDB(newPost);
     } catch (error) {
       console.dir(error);
 
@@ -57,15 +58,15 @@ export const getPosts = createAsyncThunk(
   }
 );
 
-export const getUsersPosts = createAsyncThunk(
-  'db/getUsersPosts',
+export const getCurrentUsersPosts = createAsyncThunk(
+  'DB/getCurrentUsersPosts',
   async (data, { rejectWithValue }) => {
-    const { userId, setUsersPosts } = data;
+    const { userId } = data;
     try {
-      const result = await getUsersPostsFromDB({
+      const result = await getSpecificUsersPostsFromDB({
         userId: userId,
-        setUsersPosts: setUsersPosts,
       });
+
       return result;
     } catch (error) {
       console.dir({ error });
@@ -75,31 +76,13 @@ export const getUsersPosts = createAsyncThunk(
   }
 );
 
-export const addComments = createAsyncThunk(
-  'db/addComment',
+export const addComment = createAsyncThunk(
+  'DB/addComment',
   async (data, { rejectWithValue }) => {
     const { postId, commentData } = data;
     try {
-      await addCommentToPostInDB({ postId, commentData: commentData });
-      return;
-    } catch (error) {
-      console.dir({ error });
-
-      return rejectWithValue(error.code);
-    }
-  }
-);
-
-export const getComments = createAsyncThunk(
-  'db/getComments',
-  async (data, { rejectWithValue }) => {
-    const { postId, setComments } = data;
-    try {
-      await getAllCommentsToPostFromDB({
-        postId: postId,
-        setComments: setComments,
-      });
-      return;
+      const updatedPost = await addCommentToPostInDB({ postId, commentData });
+      return updatedPost;
     } catch (error) {
       console.dir({ error });
 
@@ -109,12 +92,12 @@ export const getComments = createAsyncThunk(
 );
 
 export const addLike = createAsyncThunk(
-  'db/addLike',
+  'DB/addLike',
   async (data, { rejectWithValue }) => {
-    const { postId } = data;
+    const { postId, userId } = data;
     try {
-      await addLikeToPostInDB({ postId: postId });
-      return;
+      const likes = await addUsersLikeToDB({ postId, userId });
+      return { postId, likes };
     } catch (error) {
       console.dir({ error });
 
@@ -124,12 +107,12 @@ export const addLike = createAsyncThunk(
 );
 
 export const removeLike = createAsyncThunk(
-  'db/removeLike',
+  'DB/removeLike',
   async (data, { rejectWithValue }) => {
-    const { postId } = data;
+    const { postId, userId } = data;
     try {
-      await removeLikeToPostInDB({ postId: postId });
-      return;
+      const likes = await removeUsersLikeFromDB({ postId, userId });
+      return { postId, likes };
     } catch (error) {
       console.dir({ error });
 

@@ -17,6 +17,7 @@ import {
 import { imageUploader } from '../utils/imageUploader';
 import { signUp } from '../redux/auth/authOperations';
 import { resetAuthError } from '../redux/auth/authSlice';
+import { DEFAULT_AVATAR } from '../config/config';
 
 const RegistrationScreen = ({ navigation }) => {
   const [displayName, setDisplayName] = useState('');
@@ -45,6 +46,9 @@ const RegistrationScreen = ({ navigation }) => {
     setDisplayName('');
     setEmail('');
     setPassword('');
+    if (!avatar) {
+      setAvatar(DEFAULT_AVATAR);
+    }
 
     const result = await dispatch(
       signUp({ displayName, email, password, avatar })
