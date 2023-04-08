@@ -18,7 +18,7 @@ const MainNavigator = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Login"
+        initialRouteName="LoginScreen"
         screenOptions={({ navigation }) => ({
           headerLeft: () => <GoBackBtn navigation={navigation} />,
           headerShown: true,

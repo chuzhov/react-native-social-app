@@ -46,7 +46,7 @@ export const addPost = createAsyncThunk(
 );
 
 export const getPosts = createAsyncThunk(
-  'db/getPosts',
+  'DB/getPosts',
   async (_, { rejectWithValue }) => {
     try {
       const result = await getAllPostsFromDB();

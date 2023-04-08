@@ -25,6 +25,13 @@ import {
   userNameSelector,
   userAvatarSelector,
 } from '../redux/auth/authSelectors';
+import {
+  dbErrorSelector,
+  isDataFetchingSelector,
+} from '../redux/core/coreSelectors';
+import setErrorMsg from '../utils/setErrorMsg';
+import { resetCoreError } from '../redux/core/coreSlice';
+import SpinnerSemiTransparent from '../Components/SpinnerSemiTransparent';
 
 const CreatePostScreen = ({ navigation }) => {
   const initialFormState = {
@@ -48,6 +55,9 @@ const CreatePostScreen = ({ navigation }) => {
   const userId = useSelector(userIdSelector);
   const userName = useSelector(userNameSelector);
   const userAvatar = useSelector(userAvatarSelector);
+
+  const dbError = useSelector(dbErrorSelector);
+  const isLoading = useSelector(isDataFetchingSelector);
 
   const takePhoto = async () => {
     if (camera) {
@@ -95,26 +105,29 @@ const CreatePostScreen = ({ navigation }) => {
   const onSubmitForm = async e => {
     e.preventDefault();
 
-    const result = await dispatch(
-      addPost({
-        userId,
-        userName,
-        userAvatar,
-        title: formState.title,
-        image: formState.image,
-        coordinates: mainLocation,
-        location: formState.position,
-      })
-    );
-
-    if (result.error) {
-      console.log(error);
-    } else {
+    try {
+      const result = await dispatch(
+        addPost({
+          userId,
+          userName,
+          userAvatar,
+          title: formState.title,
+          image: formState.image,
+          coordinates: mainLocation,
+          location: formState.position,
+        })
+      );
       setKeyboardVisible(false);
       setFormState(initialFormState);
       setSubmitDisabled(true);
-
       navigation.navigate('Posts');
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: setErrorMsg(dbError),
+        text2: 'Please try again later',
+      });
+      resetCoreError();
     }
   };
 
@@ -148,6 +161,7 @@ const CreatePostScreen = ({ navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={hideKeyboard}>
       <View style={styles.container}>
+        {isLoading && <SpinnerSemiTransparent />}
         <KeyboardAvoidingView
           behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
         >

@@ -28,11 +28,13 @@ import {
   postsSelector,
 } from '../redux/core/coreSelectors';
 import isLikedByCurrentUser from '../utils/isLikedByCurrentUser';
+import Spinner from '../Components/Spinner';
 
 const ProfileScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const posts = useSelector(postsSelector);
   const isLoading = useSelector(isDataFetchingSelector);
+  const isUserLoading = useSelector(isDataFetchingSelector);
 
   const userId = useSelector(userIdSelector);
   const image = useSelector(userAvatarSelector);
@@ -40,7 +42,6 @@ const ProfileScreen = ({ navigation, route }) => {
 
   const handleLogout = () => {
     dispatch(logOut());
-    navigation.navigate('Login');
   };
 
   const handleLike = (postId, userId, likes) => {
@@ -61,7 +62,7 @@ const ProfileScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      dispatch(getCurrentUsersPosts({ userId: userId }));
+      dispatch(getCurrentUsersPosts({ userId }));
     });
     return () => {
       unsubscribe();
@@ -70,111 +71,117 @@ const ProfileScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        style={styles.bgImage}
-        source={require('../assets/img/bg.jpg')}
-      >
-        <View style={styles.contentBox}>
-          <View style={styles.avatarWrapper}>
-            {image ? (
-              <Image style={styles.avatar} source={{ uri: image }} />
-            ) : null}
-          </View>
-          <Text style={styles.title}>{name ? name : 'Dear User'}</Text>
-          <Pressable style={styles.logoutBtn} onPress={handleLogout}>
-            <Icon name="log-out" size={24} color="#BDBDBD" />
-          </Pressable>
+      {isLoading || isUserLoading ? (
+        <Spinner />
+      ) : (
+        <ImageBackground
+          style={styles.bgImage}
+          source={require('../assets/img/bg.jpg')}
+        >
+          <View style={styles.contentBox}>
+            <View style={styles.avatarWrapper}>
+              {image ? (
+                <Image style={styles.avatar} source={{ uri: image }} />
+              ) : null}
+            </View>
+            <Text style={styles.title}>{name ? name : 'Dear User'}</Text>
+            <Pressable style={styles.logoutBtn} onPress={handleLogout}>
+              <Icon name="log-out" size={24} color="#BDBDBD" />
+            </Pressable>
 
-          {posts && posts.length > 0 && (
-            <SafeAreaView style={styles.postsList}>
-              <FlatList
-                ListEmptyComponent={() =>
-                  posts.length <= 0 ? (
-                    <View style={styles.emptyMessageBox}>
-                      <Text style={styles.emptyMessageStyle}>
-                        No posts added yet
-                      </Text>
-                    </View>
-                  ) : null
-                }
-                data={posts}
-                renderItem={({ item }) => (
-                  <View style={styles.postsListItem}>
-                    <Image
-                      style={styles.postImage}
-                      source={{ uri: item.imageUrl }}
-                    />
-                    <Text style={styles.postText}>{item.title}</Text>
-                    <View style={styles.postDataWrapper}>
-                      <View style={styles.postDataAchievesWrapper}>
+            {posts && posts.length > 0 && (
+              <SafeAreaView style={styles.postsList}>
+                <FlatList
+                  ListEmptyComponent={() =>
+                    posts.length <= 0 ? (
+                      <View style={styles.emptyMessageBox}>
+                        <Text style={styles.emptyMessageStyle}>
+                          No posts added yet
+                        </Text>
+                      </View>
+                    ) : null
+                  }
+                  data={posts}
+                  renderItem={({ item }) => (
+                    <View style={styles.postsListItem}>
+                      <Image
+                        style={styles.postImage}
+                        source={{ uri: item.imageUrl }}
+                      />
+                      <Text style={styles.postText}>{item.title}</Text>
+                      <View style={styles.postDataWrapper}>
+                        <View style={styles.postDataAchievesWrapper}>
+                          <Pressable
+                            onPress={() => {
+                              handleComment(
+                                item.imageUrl,
+                                item.comments,
+                                item.id
+                              );
+                            }}
+                          >
+                            <View style={styles.postDataCommentsWrapper}>
+                              <Icon
+                                name="message-circle"
+                                size={24}
+                                color={
+                                  item.comments.length > 0
+                                    ? '#FF6C00'
+                                    : '#BDBDBD'
+                                }
+                              />
+                              <Text style={styles.postComments}>
+                                {item.comments.length ?? item.comments.length}
+                              </Text>
+                            </View>
+                          </Pressable>
+                          <Pressable
+                            onPress={() => {
+                              handleLike(item.id, userId, item.likes);
+                            }}
+                          >
+                            <View style={styles.postDataCommentsWrapper}>
+                              <Icon
+                                name="thumbs-up"
+                                size={24}
+                                color={
+                                  isLikedByCurrentUser(item.likes, userId)
+                                    ? '#FF6C00'
+                                    : '#BDBDBD'
+                                }
+                              />
+                              <Text style={styles.postComments}>
+                                {item.likes ? item.likes.length : null}
+                              </Text>
+                            </View>
+                          </Pressable>
+                        </View>
                         <Pressable
                           onPress={() => {
-                            handleComment(
-                              item.imageUrl,
-                              item.comments,
-                              item.id
+                            handleLocation(
+                              item.coordinates,
+                              item.text,
+                              item.location
                             );
                           }}
                         >
-                          <View style={styles.postDataCommentsWrapper}>
-                            <Icon
-                              name="message-circle"
-                              size={24}
-                              color={
-                                item.comments.length > 0 ? '#FF6C00' : '#BDBDBD'
-                              }
-                            />
-                            <Text style={styles.postComments}>
-                              {item.comments.length ?? item.comments.length}
-                            </Text>
-                          </View>
-                        </Pressable>
-                        <Pressable
-                          onPress={() => {
-                            handleLike(item.id, userId, item.likes);
-                          }}
-                        >
-                          <View style={styles.postDataCommentsWrapper}>
-                            <Icon
-                              name="thumbs-up"
-                              size={24}
-                              color={
-                                isLikedByCurrentUser(item.likes, userId)
-                                  ? '#FF6C00'
-                                  : '#BDBDBD'
-                              }
-                            />
-                            <Text style={styles.postComments}>
-                              {item.likes ? item.likes.length : null}
+                          <View style={styles.postLocationWrapper}>
+                            <Icon name="map-pin" size={24} color="#BDBDBD" />
+                            <Text style={styles.postLocation}>
+                              {`${item.location}`.split(',')[0]}
                             </Text>
                           </View>
                         </Pressable>
                       </View>
-                      <Pressable
-                        onPress={() => {
-                          handleLocation(
-                            item.coordinates,
-                            item.text,
-                            item.location
-                          );
-                        }}
-                      >
-                        <View style={styles.postLocationWrapper}>
-                          <Icon name="map-pin" size={24} color="#BDBDBD" />
-                          <Text style={styles.postLocation}>
-                            {`${item.location}`.split(',')[0]}
-                          </Text>
-                        </View>
-                      </Pressable>
                     </View>
-                  </View>
-                )}
-                keyExtractor={item => item.id}
-              />
-            </SafeAreaView>
-          )}
-        </View>
-      </ImageBackground>
+                  )}
+                  keyExtractor={item => item.id}
+                />
+              </SafeAreaView>
+            )}
+          </View>
+        </ImageBackground>
+      )}
     </View>
   );
 };

@@ -5,7 +5,6 @@ const pending = state => {
   state.isUserFetching = true;
 };
 const rejected = (state, { payload }) => {
-  console.log(payload);
   state.isUserFetching = false;
   state.isLoggedIn = false;
   state.authError = payload;

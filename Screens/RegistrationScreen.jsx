@@ -18,6 +18,10 @@ import { imageUploader } from '../utils/imageUploader';
 import { signUp } from '../redux/auth/authOperations';
 import { resetAuthError } from '../redux/auth/authSlice';
 import { DEFAULT_AVATAR } from '../config/config';
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
+import setErrorMsg from '../utils/setErrorMsg';
+import { authErrorSelector } from '../redux/auth/authSelectors';
+import { isLoggedInSelector } from '../redux/auth/authSelectors';
 
 const RegistrationScreen = ({ navigation }) => {
   const [displayName, setDisplayName] = useState('');
@@ -29,6 +33,8 @@ const RegistrationScreen = ({ navigation }) => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [focused, setFocused] = useState('');
   const dispatch = useDispatch();
+  const signUpError = useSelector(authErrorSelector);
+  const isLogged = useSelector(isLoggedInSelector);
 
   const displayNameInputHandler = userInput => {
     setDisplayName(userInput);
@@ -43,21 +49,14 @@ const RegistrationScreen = ({ navigation }) => {
   const onRegFormSubmit = async event => {
     event.preventDefault();
 
-    setDisplayName('');
-    setEmail('');
-    setPassword('');
     if (!avatar) {
       setAvatar(DEFAULT_AVATAR);
     }
 
-    const result = await dispatch(
-      signUp({ displayName, email, password, avatar })
-    );
-    if (result.error) {
-      //handle signup error
-      dispatch(resetAuthError());
-    } else {
-      navigation.navigate('Home');
+    dispatch(signUp({ displayName, email, password, avatar }));
+
+    if (!isLogged) {
+      setAvatar(null);
     }
   };
 
@@ -77,6 +76,16 @@ const RegistrationScreen = ({ navigation }) => {
       setSubmitDisabled(true);
     }
   }, [email, password, displayName]);
+
+  useEffect(() => {
+    if (signUpError) {
+      Toast.show({
+        type: 'error',
+        text1: setErrorMsg(signUpError),
+      });
+      dispatch(resetAuthError());
+    }
+  }, [signUpError]);
 
   return (
     <TouchableWithoutFeedback onPress={hideKeyboard}>
@@ -206,6 +215,7 @@ const RegistrationScreen = ({ navigation }) => {
             </View>
           </KeyboardAvoidingView>
         </ImageBackground>
+        <Toast />
       </View>
     </TouchableWithoutFeedback>
   );

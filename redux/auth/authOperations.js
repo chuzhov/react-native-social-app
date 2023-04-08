@@ -33,13 +33,6 @@ export const signUp = createAsyncThunk(
         avatar: avatarUrl,
       };
     } catch (error) {
-      //       error.code = 'auth/network-request-failed'
-      //        error.code = 'auth/email-already-in-use'
-      // auth/invalid-email
-      // auth/weak-password
-
-      console.log(error);
-
       return rejectWithValue(error.code);
     }
   }

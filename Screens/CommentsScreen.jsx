@@ -23,6 +23,10 @@ import {
 import { addComment } from '../redux/core/coreOperations';
 import useSpecificPostComments from '../hooks/useSpecificPostComments';
 import setDateTimeFromString from '../utils/setDateTimeFromString';
+import Spinner from '../Components/Spinner';
+import { isDataFetchingSelector } from '../redux/core/coreSelectors';
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
+import { resetCoreError } from '../redux/core/coreSlice';
 
 const CommentsScreen = ({ navigation, route }) => {
   const { image, postId } = route.params;
@@ -33,6 +37,7 @@ const CommentsScreen = ({ navigation, route }) => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const dispatch = useDispatch();
+  const isLoading = useSelector(isDataFetchingSelector);
   const comments = useSpecificPostComments(postId);
 
   useEffect(() => {
@@ -59,7 +64,11 @@ const CommentsScreen = ({ navigation, route }) => {
     };
     const addResult = await dispatch(addComment({ postId, commentData }));
     if (addResult.error) {
-      console.log('error in addComment', addResult.error);
+      Toast.show({
+        type: 'error',
+        text1: setErrorMsg(addResult.error),
+      });
+      resetCoreError();
     } else {
       setText('');
       handleKeyboard();
@@ -70,95 +79,102 @@ const CommentsScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <KeyboardAvoidingView keyboardVerticalOffset={40} behavior="position">
-        <TouchableWithoutFeedback onPress={handleKeyboard}>
-          <View style={styles.imageWrapper}>
-            <Image style={styles.postImage} source={{ uri: image }} />
-          </View>
-        </TouchableWithoutFeedback>
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <KeyboardAvoidingView keyboardVerticalOffset={40} behavior="position">
+          <TouchableWithoutFeedback onPress={handleKeyboard}>
+            <View style={styles.imageWrapper}>
+              <Image style={styles.postImage} source={{ uri: image }} />
+            </View>
+          </TouchableWithoutFeedback>
 
-        <View style={styles.dataWrapper}>
-          <SafeAreaView style={styles.postsList}>
-            <FlatList
-              ListEmptyComponent={() =>
-                comments.length <= 0 ? (
-                  <View style={styles.emptyMessageBox}>
-                    <Text style={styles.emptyMessageStyle}>
-                      No comments added yet
-                    </Text>
-                  </View>
-                ) : null
-              }
-              data={comments}
-              renderItem={({ item }) => (
-                <TouchableWithoutFeedback onPress={handleKeyboard}>
-                  <View
-                    style={
-                      item.userId === userId
-                        ? styles.commentBox
-                        : { ...styles.commentBox, flexDirection: 'row-reverse' }
-                    }
-                  >
-                    <View style={styles.commentTextWrapper}>
-                      <Text style={styles.commentText}>{item.text}</Text>
-                      <Text style={styles.commentDate}>
-                        {setDateTimeFromString(item.createdAt)}
+          <View style={styles.dataWrapper}>
+            <SafeAreaView style={styles.postsList}>
+              <FlatList
+                ListEmptyComponent={() =>
+                  comments.length <= 0 ? (
+                    <View style={styles.emptyMessageBox}>
+                      <Text style={styles.emptyMessageStyle}>
+                        No comments added yet
                       </Text>
                     </View>
-                    <View style={styles.commentAvatar}>
-                      <Image
-                        style={styles.commentAvatar}
-                        source={{ uri: item.userAvatar }}
-                      />
+                  ) : null
+                }
+                data={comments}
+                renderItem={({ item }) => (
+                  <TouchableWithoutFeedback onPress={handleKeyboard}>
+                    <View
+                      style={
+                        item.userId === userId
+                          ? styles.commentBox
+                          : {
+                              ...styles.commentBox,
+                              flexDirection: 'row-reverse',
+                            }
+                      }
+                    >
+                      <View style={styles.commentTextWrapper}>
+                        <Text style={styles.commentText}>{item.text}</Text>
+                        <Text style={styles.commentDate}>
+                          {setDateTimeFromString(item.createdAt)}
+                        </Text>
+                      </View>
+                      <View style={styles.commentAvatar}>
+                        <Image
+                          style={styles.commentAvatar}
+                          source={{ uri: item.userAvatar }}
+                        />
+                      </View>
                     </View>
-                  </View>
-                </TouchableWithoutFeedback>
-              )}
-              keyExtractor={keyExtractor}
-            />
-          </SafeAreaView>
-
-          <View
-            style={{
-              ...styles.commentInputWrapper,
-              paddingBottom:
-                keyboardVisible && Platform.OS == 'android' ? 32 : 16,
-            }}
-          >
-            <TextInput
-              style={
-                text
-                  ? { ...styles.commentInput, color: '#212121' }
-                  : styles.commentInput
-              }
-              value={text}
-              multiline
-              autoFocus={false}
-              selectionColor="#FF6C00"
-              blurOnSubmit={true}
-              placeholderTextColor="#BDBDBD"
-              onChangeText={textHandler}
-              onFocus={() => {
-                setKeyboardVisible(true);
-              }}
-              onBlur={() => {
-                setKeyboardVisible(false);
-              }}
-              placeholder="Comment..."
-            ></TextInput>
-            <Pressable
+                  </TouchableWithoutFeedback>
+                )}
+                keyExtractor={keyExtractor}
+              />
+            </SafeAreaView>
+            <View
               style={{
-                ...styles.addCommentBtn,
-                opacity: submitDisabled ? 0.5 : 1,
+                ...styles.commentInputWrapper,
+                paddingBottom:
+                  keyboardVisible && Platform.OS == 'android' ? 32 : 16,
               }}
-              onPress={handlePostComment}
-              disabled={submitDisabled}
             >
-              <AntDesign name="arrowup" size={20} color="#ffffff" />
-            </Pressable>
+              <TextInput
+                style={
+                  text
+                    ? { ...styles.commentInput, color: '#212121' }
+                    : styles.commentInput
+                }
+                value={text}
+                multiline
+                autoFocus={false}
+                selectionColor="#FF6C00"
+                blurOnSubmit={true}
+                placeholderTextColor="#BDBDBD"
+                onChangeText={textHandler}
+                onFocus={() => {
+                  setKeyboardVisible(true);
+                }}
+                onBlur={() => {
+                  setKeyboardVisible(false);
+                }}
+                placeholder="Comment..."
+              ></TextInput>
+              <Pressable
+                style={{
+                  ...styles.addCommentBtn,
+                  opacity: submitDisabled ? 0.5 : 1,
+                }}
+                onPress={handlePostComment}
+                disabled={submitDisabled}
+              >
+                <AntDesign name="arrowup" size={20} color="#ffffff" />
+              </Pressable>
+            </View>
           </View>
-        </View>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      )}
+      <Toast />
     </View>
   );
 };

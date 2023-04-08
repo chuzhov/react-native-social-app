@@ -3,6 +3,7 @@ import { View, StyleSheet, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import GoBackBtn from '../Components/GoBackBtn';
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
 
 const MapScreen = ({ navigation, route }) => {
   const coordinates = route.params.coordinates;
@@ -13,10 +14,12 @@ const MapScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     (async () => {
-      console.log(MapScreen.navigationOptions);
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        console.log('Permission to access location was denied');
+        Toast.show({
+          type: 'error',
+          text1: 'Permission to access location was denied',
+        });
       }
       let location = await Location.getCurrentPositionAsync({});
       const coords = {
@@ -63,6 +66,7 @@ const MapScreen = ({ navigation, route }) => {
           />
         )}
       </MapView>
+      <Toast />
     </View>
   );
 };

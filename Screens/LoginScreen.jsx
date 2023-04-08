@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   TouchableWithoutFeedback,
   StyleSheet,
@@ -13,9 +13,12 @@ import {
   ImageBackground,
   Text,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 import { signIn } from '../redux/auth/authOperations';
 import { resetAuthError } from '../redux/auth/authSlice';
+import { authErrorSelector } from '../redux/auth/authSelectors';
+import setErrorMsg from '../utils/setErrorMsg';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -25,6 +28,7 @@ const LoginScreen = ({ navigation }) => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [focused, setFocused] = useState('');
   const dispatch = useDispatch();
+  const signInError = useSelector(authErrorSelector);
 
   const emailInputHandler = userInput => {
     setEmail(userInput);
@@ -36,15 +40,16 @@ const LoginScreen = ({ navigation }) => {
   const onLoginSubmit = async event => {
     event.preventDefault();
 
-    const result = await dispatch(signIn({ email, password }));
-    if (result.error) {
-      dispatch(resetAuthError());
-      //handle login error
-    } else {
-      setEmail('');
-      setPassword('');
-      navigation.navigate('Home');
-    }
+    //const result = await
+    dispatch(signIn({ email, password }));
+    // if (result.error) {
+    //   dispatch(resetAuthError());
+    //   //handle login error
+    // } else {
+    //   setEmail('');
+    //   setPassword('');
+    //   navigation.navigate('Home');
+    // }
   };
 
   const togglePasswordVisibility = () => {
@@ -64,6 +69,16 @@ const LoginScreen = ({ navigation }) => {
       setSubmitDisabled(true);
     }
   }, [email, password]);
+
+  useEffect(() => {
+    if (signInError) {
+      Toast.show({
+        type: 'error',
+        text1: setErrorMsg(signInError),
+      });
+      dispatch(resetAuthError());
+    }
+  }, [signInError]);
 
   return (
     <TouchableWithoutFeedback onPress={hideKeyboard}>
@@ -154,6 +169,7 @@ const LoginScreen = ({ navigation }) => {
             </View>
           </KeyboardAvoidingView>
         </ImageBackground>
+        <Toast />
       </View>
     </TouchableWithoutFeedback>
   );

@@ -12,7 +12,7 @@ const uploadAvatarToFireStorage = async (userId, image) => {
     const imageUrl = await imageRef.getDownloadURL();
     return imageUrl;
   } catch (error) {
-    console.log(error);
+    throw new Error(error);
   }
 };
 
