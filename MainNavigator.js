@@ -1,14 +1,15 @@
 import { createStackNavigator } from '@react-navigation/stack';
-
-import LoginScreen from './Screens/LoginScreen';
-import RegisterScreen from './Screens/RegistrationScreen';
-import Home from './Screens/Home';
-import MapScreen from './Screens/MapScreen';
-import CommentsScreen from './Screens/CommentsScreen';
-import GoBackBtn from './Components/GoBackBtn';
-
 import { NavigationContainer } from '@react-navigation/native';
-import { isLoggedInSelector } from './redux/auth/authSelectors';
+
+import LoginScreen from './src/Screens/LoginScreen';
+import RegisterScreen from './src/Screens/RegistrationScreen';
+import Home from './src/Screens/Home';
+import MapScreen from './src/Screens/MapScreen';
+import CommentsScreen from './src/Screens/CommentsScreen';
+
+import GoBackBtn from './src/Components/GoBackBtn';
+
+import { isLoggedInSelector } from './src/redux/auth/authSelectors';
 import { useSelector } from 'react-redux';
 
 const MainNavigator = () => {

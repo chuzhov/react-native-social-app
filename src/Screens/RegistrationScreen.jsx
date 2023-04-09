@@ -14,11 +14,12 @@ import {
   Text,
   Image,
 } from 'react-native';
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
+
 import { imageUploader } from '../utils/imageUploader';
 import { signUp } from '../redux/auth/authOperations';
 import { resetAuthError } from '../redux/auth/authSlice';
 import { DEFAULT_AVATAR } from '../config/config';
-import { Toast } from 'react-native-toast-message/lib/src/Toast';
 import setErrorMsg from '../utils/setErrorMsg';
 import { authErrorSelector } from '../redux/auth/authSelectors';
 import { isLoggedInSelector } from '../redux/auth/authSelectors';

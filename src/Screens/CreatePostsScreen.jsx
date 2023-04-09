@@ -16,9 +16,9 @@ import {
 } from 'react-native';
 import Icon from '@expo/vector-icons/MaterialIcons';
 import { Feather } from '@expo/vector-icons';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { GEOLOC_API_URL, GEOLOC_API_KEY } from '../config/config';
-import { useDispatch, useSelector } from 'react-redux';
 import { addPost } from '../redux/core/coreOperations';
 import {
   userIdSelector,
@@ -32,6 +32,11 @@ import {
 import setErrorMsg from '../utils/setErrorMsg';
 import { resetCoreError } from '../redux/core/coreSlice';
 import SpinnerSemiTransparent from '../Components/SpinnerSemiTransparent';
+import {
+  checkMediaLibraryPermission,
+  requestMediaLibraryPermission,
+} from '../utils/mediaLibraryPermissions';
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
 
 const CreatePostScreen = ({ navigation }) => {
   const initialFormState = {
@@ -63,6 +68,19 @@ const CreatePostScreen = ({ navigation }) => {
     if (camera) {
       const photo = await camera.takePictureAsync();
       if (!photo) return false;
+
+      const mediaLibraryPermission = await checkMediaLibraryPermission();
+      if (!mediaLibraryPermission) {
+        const granted = await requestMediaLibraryPermission();
+        Toast.show({
+          type: 'error',
+          text1: 'Error:',
+          text2:
+            'This app needs access to your media library to work properly.',
+        });
+        if (!granted) return false;
+      }
+
       await MediaLibrary.createAssetAsync(photo.uri);
 
       let location = await Location.getCurrentPositionAsync({});
@@ -256,6 +274,7 @@ const CreatePostScreen = ({ navigation }) => {
         >
           <Feather name="trash-2" size={24} color="#BDBDBD" />
         </Pressable>
+        <Toast />
       </View>
     </TouchableWithoutFeedback>
   );

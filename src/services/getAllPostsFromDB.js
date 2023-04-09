@@ -2,10 +2,12 @@ import { db } from '../firebase/config';
 
 export const getAllPostsFromDB = async (limit = 20) => {
   try {
-    const snapshot = await db
-      .collection('posts')
-      .orderBy('createdAt', 'desc')
-      .get();
+    const snapshot = await Promise.race([
+      db.collection('posts').orderBy('createdAt', 'desc').get(),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Firestore timeout')), 10000)
+      ),
+    ]);
 
     const records = snapshot.docs.map(doc => {
       const data = doc.data();

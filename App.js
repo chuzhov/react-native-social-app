@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Provider, useSelector } from 'react-redux';
+import { Provider } from 'react-redux';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
 
-import store from './redux/store';
-
+import store from './src/redux/store';
 import MainNavigator from './MainNavigator';
 
 const appFonts = {
-  'Roboto-Regular': require('./assets/fonts/Roboto/Roboto-Regular.ttf'),
-  'Roboto-Medium': require('./assets/fonts/Roboto/Roboto-Medium.ttf'),
-  'Roboto-Bold': require('./assets/fonts/Roboto/Roboto-Bold.ttf'),
+  'Roboto-Regular': require('./src/assets/fonts/Roboto/Roboto-Regular.ttf'),
+  'Roboto-Medium': require('./src/assets/fonts/Roboto/Roboto-Medium.ttf'),
+  'Roboto-Bold': require('./src/assets/fonts/Roboto/Roboto-Bold.ttf'),
 };
 
 export default () => {

@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-import GoBackBtn from '../Components/GoBackBtn';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
+
+import GoBackBtn from '../Components/GoBackBtn';
 
 const MapScreen = ({ navigation, route }) => {
   const coordinates = route.params.coordinates;

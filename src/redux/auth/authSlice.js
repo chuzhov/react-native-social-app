@@ -42,8 +42,6 @@ export const authSlice = createSlice({
         state.isUserFetching = false;
       })
       .addCase(signIn.fulfilled, (state, { payload }) => {
-        console.log('authSlice payload: ', payload);
-
         state.userData.userId = payload.uid;
         state.userData.email = payload.email;
         state.userData.name = payload.name;

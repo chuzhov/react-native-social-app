@@ -14,19 +14,19 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from 'react-native';
-
 import { AntDesign } from '@expo/vector-icons';
+
 import {
   userIdSelector,
   userAvatarSelector,
 } from '../redux/auth/authSelectors';
-import { addComment } from '../redux/core/coreOperations';
 import useSpecificPostComments from '../hooks/useSpecificPostComments';
-import setDateTimeFromString from '../utils/setDateTimeFromString';
-import Spinner from '../Components/Spinner';
+import { addComment } from '../redux/core/coreOperations';
+import { resetCoreError } from '../redux/core/coreSlice';
+import setDateTimeFromString from '../../src/utils/setDateTimeFromString';
 import { isDataFetchingSelector } from '../redux/core/coreSelectors';
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
-import { resetCoreError } from '../redux/core/coreSlice';
+import Spinner from '../Components/Spinner';
 
 const CommentsScreen = ({ navigation, route }) => {
   const { image, postId } = route.params;
