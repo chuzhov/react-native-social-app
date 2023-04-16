@@ -1,4 +1,4 @@
-# react-native-first
+# react-native-social-app
 a React Native App
 
 This is mobile social app with ability to upload you photos and share them to the community,
